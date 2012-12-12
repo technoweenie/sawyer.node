@@ -24,12 +24,12 @@ class Agent
     callback or= options.callback
     started = null
 
-    decoder = @decodeBody
+    agent = @
     @client.scope url, (cli) ->
       started = new Date
       cli[method]() (err, res, body) ->
         return unless callback
-        callback new Response(res, body, started, decoder)
+        callback new Response(agent, res, body, started)
 
   decodeBody: (str) ->
     JSON.parse str
@@ -37,12 +37,31 @@ class Agent
 Agent.noBody = ['get', 'head']
 
 class Response
-  constructor: (@response, @body, @started, @decoder) ->
+  constructor: (@agent, @response, body, @started) ->
     @time = new Date
     @status = @response.statusCode
-    @data = @decoder @body
+    @data = new Resource @agent, body
     @headers = @response.headers
     @timing = @time - @started
+
+class Resource
+  constructor: (@agent, json) ->
+    @extractAttributes @agent.decodeBody json
+
+  get: (key) ->
+    @data[key]
+
+  extractAttributes: (data) ->
+    @data = {}
+    for key, value of data
+      if key in Resource.reserved
+        @data[key] = value
+      else
+        @[key] = value
+
+Resource.reserved = []
+for key, value of Resource.prototype
+  Resource.reserved.push key
 
 exports.create = (args...) ->
   new Agent args...

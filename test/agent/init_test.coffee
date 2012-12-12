@@ -1,5 +1,4 @@
-Agent = require '../../src'
-assert = require 'assert'
+require '../helper'
 
 endpoint = 'http://127.0.0.1:9999'
 

@@ -7,6 +7,23 @@ class Agent
     @client or= require("./vendor/scoped-http-client").create(@endpoint)
     callback?(@client)
 
+  root: (callback) ->
+    if @rootResource
+      callback? @rootResource
+    else if @rootCallbacks
+      @rootCallbacks.push callback
+    else
+      @rootCallbacks = [callback]
+      @start (res) =>
+        callbacks = @rootCallbacks
+        delete @rootCallbacks
+        @rootResource = res
+        for cb in callbacks
+          cb? res
+
+  start: (callback) ->
+    @call 'get', @endpoint, callback
+
   call: (method, url, data, options, callback) ->
     if typeof data is 'function'
       options = data

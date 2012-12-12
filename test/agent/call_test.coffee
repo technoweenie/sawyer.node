@@ -1,6 +1,5 @@
 require '../helper'
 
-
 server = Test.server (req, res) ->
   res.writeHead 200,
     'Content-Type': 'application/json'

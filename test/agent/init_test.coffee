@@ -1,6 +1,6 @@
 require '../helper'
 
-endpoint = 'http://127.0.0.1:9999'
+endpoint = Test.endpoint
 
 # agent with endpoint
 agent = Agent.create endpoint

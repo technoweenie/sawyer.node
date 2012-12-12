@@ -12,7 +12,10 @@ server = Http.createServer (req, res) ->
 server.listen Test.port
 
 agent = Agent.create(Test.endpoint)
-agent.call 'get', 'foo', (body) ->
-  console.log 'shout out', body
+agent.call 'get', 'foo', (res) ->
+  assert.equal 200, res.status
+  assert.equal 'GET', res.data.method
+  assert.equal '/foo', res.data.url
+  assert.equal 'application/json', res.headers['content-type']
   server.close()
 

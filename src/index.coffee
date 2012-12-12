@@ -24,11 +24,22 @@ class Agent
     callback or= options.callback
     started = null
 
+    decoder = @decodeBody
     @client.scope url, (cli) ->
       cli[method]() (err, res, body) ->
-        callback? body
+        return unless callback
+        callback new Response(res, body, decoder)
+
+  decodeBody: (str) ->
+    JSON.parse str
 
 Agent.noBody = ['get', 'head']
+
+class Response
+  constructor: (@response, @body, @decoder) ->
+    @status = @response.statusCode
+    @data = @decoder @body
+    @headers = @response.headers
 
 exports.create = (args...) ->
   new Agent args...

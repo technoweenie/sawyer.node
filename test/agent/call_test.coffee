@@ -1,7 +1,7 @@
 require '../helper'
 
 
-server = Http.createServer (req, res) ->
+server = Test.server (req, res) ->
   res.writeHead 200,
     'Content-Type': 'application/json'
   res.end JSON.stringify(
@@ -9,13 +9,13 @@ server = Http.createServer (req, res) ->
     url: req.url
   )
 
-server.listen Test.port
-
-agent = Agent.create(Test.endpoint)
+agent = Test.agent()
 agent.call 'get', 'foo', (res) ->
   assert.equal 200, res.status
   assert.equal 'GET', res.data.method
   assert.equal '/foo', res.data.url
   assert.equal 'application/json', res.headers['content-type']
+  assert.ok res.time
+  assert.ok res.timing
   server.close()
 

@@ -26,9 +26,10 @@ class Agent
 
     decoder = @decodeBody
     @client.scope url, (cli) ->
+      started = new Date
       cli[method]() (err, res, body) ->
         return unless callback
-        callback new Response(res, body, decoder)
+        callback new Response(res, body, started, decoder)
 
   decodeBody: (str) ->
     JSON.parse str
@@ -36,10 +37,12 @@ class Agent
 Agent.noBody = ['get', 'head']
 
 class Response
-  constructor: (@response, @body, @decoder) ->
+  constructor: (@response, @body, @started, @decoder) ->
+    @time = new Date
     @status = @response.statusCode
     @data = @decoder @body
     @headers = @response.headers
+    @timing = @time - @started
 
 exports.create = (args...) ->
   new Agent args...
